@@ -1,0 +1,26 @@
+version: "3.6"
+
+services:
+  rabbitmq:
+    image: masstransit/rabbitmq:latest
+    ports:
+     - "5672:5672"
+     - "15672:15672"
+     - "15692:15692"
+  backend:
+    image: toofast/backend
+    build:
+      context: ./src
+      dockerfile: Dockerfile.backend
+    restart: always      
+    ports:
+     - "5002:80"
+  frontend:
+    image: toofast/frontend
+    build:
+      context: ./src
+      dockerfile: Dockerfile.frontend
+    restart: always      
+    ports:
+     - "5000:80"
+    

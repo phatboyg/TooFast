@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+WORKDIR /src
+COPY ["TooFast.BackEnd/TooFast.BackEnd.csproj", "TooFast.BackEnd/"]
+COPY ["TooFast.Contracts/TooFast.Contracts.csproj", "TooFast.Contracts/"]
+RUN dotnet restore "TooFast.BackEnd/TooFast.BackEnd.csproj"
+
+COPY . .
+RUN dotnet publish -c Release -o /app TooFast.BackEnd/TooFast.BackEnd.csproj 
+
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS publish
+WORKDIR /app
+COPY --from=build /app ./
+ENTRYPOINT ["dotnet", "TooFast.BackEnd.dll"]
