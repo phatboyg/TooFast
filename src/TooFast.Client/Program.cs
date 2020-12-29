@@ -23,10 +23,10 @@
                 {
                     await using var clientFactory = await bus.CreateReplyToClientFactory();
 
-                    var client = clientFactory.CreateRequestClient<SubmitOrder>();
+                    IRequestClient<SubmitOrder> client = clientFactory.CreateRequestClient<SubmitOrder>();
 
                     var messageCount = 10000;
-                    int concurrentMessageCount = 40;
+                    var concurrentMessageCount = 40;
                     var loopLimit = messageCount / concurrentMessageCount;
 
                     // warmup
@@ -35,12 +35,10 @@
 
                     // do it
 
-                    Stopwatch timer = Stopwatch.StartNew();
+                    var timer = Stopwatch.StartNew();
 
-                    for (int i = 0; i < loopLimit; i++)
-                    {
+                    for (var i = 0; i < loopLimit; i++)
                         await Task.WhenAll(Enumerable.Range(0, concurrentMessageCount).Select(x => ProcessOrder(client)));
-                    }
 
                     timer.Stop();
 
@@ -63,9 +61,9 @@
 
         static async Task ProcessOrder(IRequestClient<SubmitOrder> client)
         {
-            var response = await client.GetResponse<OrderSubmitted, OrderRejected>(new SubmitOrder()
+            Response<OrderSubmitted, OrderRejected> response = await client.GetResponse<OrderSubmitted, OrderRejected>(new SubmitOrder
             {
-                Order = new OrderModel()
+                Order = new OrderModel
                 {
                     OrderId = NewId.NextGuid(),
                     Total = 1234.56m
